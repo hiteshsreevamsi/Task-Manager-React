@@ -6,6 +6,9 @@ import AccordionSummary from "@material-ui/core/AccordionSummary";
 import AccordionActions from "@material-ui/core/AccordionActions";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ExpansionPanel from "@material-ui/core/ExpansionPanel";
+import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
+import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 export default class grid extends React.Component {
   constructor() {
     super();
@@ -19,31 +22,33 @@ export default class grid extends React.Component {
           Assigned_to: "unassign",
           Task_Description: "Write waat ever you want",
           Task_Status: "Incomplete",
-          created: new Date().toString(),
+          created: new Date().toDateString(),
         },
         {
           Task_name: "second",
           Assigned_to: "unassign",
-          Task_Description: "Write waat ever you want",
+          Task_Description:
+            "Write waat ever you want,Write waat ever you want,Write waat ever you want,Write waat ever you want",
           Task_Status: "Incomplete",
-          created: new Date().toString(),
+          created: new Date().toDateString(),
         },
         {
           Task_name: "third",
           Assigned_to: "hitesh",
           Task_Description: "Write waat ever you want",
           Task_Status: "Incomplete",
-          created: new Date().toString(),
+          created: new Date().toDateString(),
         },
       ],
       users: {
         hitesh: [],
         "sri sai": [],
         sanjay: [],
-        unassigned: [],
+        unassign: [],
       },
     };
   }
+  changeData = () => {};
   componentDidMount() {
     this.assiging();
     this.setState({ dataloaded: true });
@@ -65,17 +70,18 @@ export default class grid extends React.Component {
   taskdata = (data) => {
     return this.state.users[data].map((task) => {
       return (
-        <React.Fragment>
-          <tr>
-            <td>
-              <Task
-                Task_title={task.Task_name}
-                Assigned_to={task.Assigned_to}
-                last_edited={task.created}
-              ></Task>
-            </td>
-          </tr>
-        </React.Fragment>
+        <tr>
+          <td>
+            <Task
+              complete={this.state.users}
+              names={Object.keys(this.state.users)}
+              Task_title={task.Task_name}
+              Assigned_to={task.Assigned_to}
+              last_edited={task.created}
+              Task_Description={task.Task_Description}
+            ></Task>
+          </td>
+        </tr>
       );
     });
   };
