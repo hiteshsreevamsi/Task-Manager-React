@@ -6,9 +6,9 @@ import AccordionSummary from "@material-ui/core/AccordionSummary";
 import AccordionActions from "@material-ui/core/AccordionActions";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import ExpansionPanel from "@material-ui/core/ExpansionPanel";
-import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
-import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
+
+import { v4 as uuidv4 } from "uuid";
+import Grid from "@material-ui/core/Grid";
 export default class grid extends React.Component {
   constructor() {
     super();
@@ -16,28 +16,32 @@ export default class grid extends React.Component {
     this.state = {
       dataloaded: false,
       expand: false,
+      status: ["To be done", "doing", "done"],
       tasks: [
         {
           Task_name: "first",
           Assigned_to: "unassign",
           Task_Description: "Write waat ever you want",
-          Task_Status: "Incomplete",
+          Task_Status: "doing",
           created: new Date().toDateString(),
+          task_id: uuidv4(),
         },
         {
           Task_name: "second",
           Assigned_to: "unassign",
           Task_Description:
             "Write waat ever you want,Write waat ever you want,Write waat ever you want,Write waat ever you want",
-          Task_Status: "Incomplete",
-          created: new Date().toDateString(),
+          Task_Status: "doing",
+          created: new Date(1597509562728).toDateString(),
+          task_id: uuidv4(),
         },
         {
           Task_name: "third",
           Assigned_to: "hitesh",
           Task_Description: "Write waat ever you want",
-          Task_Status: "Incomplete",
+          Task_Status: "doing",
           created: new Date().toDateString(),
+          task_id: uuidv4(),
         },
       ],
       users: {
@@ -48,41 +52,71 @@ export default class grid extends React.Component {
       },
     };
   }
-  changeData = () => {};
+
   componentDidMount() {
     this.assiging();
     this.setState({ dataloaded: true });
+    console.log(new Date().getTime().toString());
   }
   assiging = () => {
-    for (let i = 0; i < this.state.tasks.length; i++) {
+    let users = {
+      hitesh: [],
+      "sri sai": [],
+      sanjay: [],
+      unassign: [],
+    };
+    this.state.tasks.map((task, id) => {
       try {
-        this.state.users[this.state.tasks[i].Assigned_to].push(
-          this.state.tasks[i]
-        );
-      } catch (e) {
-        this.state.users["unassigned"].push(this.state.tasks[i]);
+        users[task.Assigned_to].push(task);
+      } catch (error) {
+        users["unassigned"].push(task);
       }
-    }
+    });
+    this.setState({ users });
   };
   expand = () => {
     this.setState({ expand: !this.state.expand });
   };
-  taskdata = (data) => {
+  updateAssignment = (id, to) => {
+    let scope = this.state.tasks.filter((item) => item.task_id === id);
+    let nonScope = this.state.tasks.filter((item) => item.task_id != id);
+    scope[0].Assigned_to = to;
+    this.setState({
+      tasks: [...scope, ...nonScope],
+    });
+    this.assiging();
+  };
+  changeData = (id, to) => {
+    let scope = this.state.tasks.filter((item) => item.task_id === id);
+    let nonScope = this.state.tasks.filter((item) => item.task_id != id);
+    scope[0].Task_Status = to;
+    this.setState({
+      tasks: [...scope, ...nonScope],
+    });
+    this.assiging();
+  };
+  taskdata = (data, status) => {
     return this.state.users[data].map((task) => {
-      return (
-        <tr>
-          <td>
-            <Task
-              complete={this.state.users}
-              names={Object.keys(this.state.users)}
-              Task_title={task.Task_name}
-              Assigned_to={task.Assigned_to}
-              last_edited={task.created}
-              Task_Description={task.Task_Description}
-            ></Task>
-          </td>
-        </tr>
-      );
+      if (task.Task_Status == status) {
+        return (
+          <tr>
+            <td>
+              <Task
+                task_change={this.changeData}
+                status={this.state.status}
+                identity={task.task_id}
+                names={Object.keys(this.state.users)}
+                Task_title={task.Task_name}
+                Assigned_to={task.Assigned_to}
+                last_edited={task.created}
+                Task_Description={task.Task_Description}
+                changer={this.updateAssignment}
+                Task_Status={task.Task_Status}
+              ></Task>
+            </td>
+          </tr>
+        );
+      }
     });
   };
   render() {
@@ -99,7 +133,20 @@ export default class grid extends React.Component {
                   >
                     <Typography> {key}</Typography>
                   </AccordionSummary>
-                  <AccordionDetails>{this.taskdata(key)}</AccordionDetails>
+                  <AccordionDetails>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12}>
+                        <Grid container justify='center' spacing={2}>
+                          {["To be done", "doing", "done"].map((value) => (
+                            <Grid key={value} item>
+                              <h5>{value}</h5>
+                              {this.taskdata(key, value)}
+                            </Grid>
+                          ))}
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                  </AccordionDetails>
                 </Accordion>
               );
             })

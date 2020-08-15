@@ -7,6 +7,7 @@ import CardContent from "@material-ui/core/CardContent";
 import CardActions from "@material-ui/core/CardActions";
 import Collapse from "@material-ui/core/Collapse";
 import { red } from "@material-ui/core/colors";
+import { green } from "@material-ui/core/colors";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
@@ -16,15 +17,29 @@ import { Typography } from "@material-ui/core";
 
 export default class TaskStructure extends React.Component {
   nameselect = (event) => {
-    debugger;
-    this.props.Assigned_to = event.target.value;
+    let to = event.target.value;
+    this.props.changer(this.props.identity, to);
+  };
+  statuselect = (event) => {
+    let to = event.target.value;
+    this.props.task_change(this.props.identity, to);
+  };
+  color = (expiry) => {
+    if (expiry < new Date()) {
+      return red[500];
+    } else return green[500];
   };
   render() {
     return (
       <div>
         <Card
           variant='outlined'
-          style={{ marginBottom: 10, height: 300, width: 300 }}
+          style={{
+            marginBottom: 10,
+            height: 300,
+            width: 300,
+            borderColor: this.color(this.props.last_edited),
+          }}
         >
           <CardHeader
             avatar={
@@ -38,7 +53,20 @@ export default class TaskStructure extends React.Component {
             subheader={this.props.last_edited}
           />
           <CardContent>
-            <FormControl>
+            <FormControl style={{ float: "right" }}>
+              <InputLabel id='demo-simple-select-label'>Status</InputLabel>
+              <Select
+                labelId='demo-simple-select-label'
+                id='demo-simple-select'
+                value={this.props.Task_Status}
+                onChange={this.statuselect}
+              >
+                {this.props.status.map((name) => {
+                  return <MenuItem value={name}>{name}</MenuItem>;
+                })}
+              </Select>
+            </FormControl>
+            <FormControl style={{ float: "left" }}>
               <InputLabel id='demo-simple-select-label'>Assigned to</InputLabel>
               <Select
                 labelId='demo-simple-select-label'
@@ -52,7 +80,7 @@ export default class TaskStructure extends React.Component {
               </Select>
             </FormControl>
           </CardContent>
-          <CardContent>
+          <CardContent style={{ paddingBottom: 0, paddingTop: 40 }}>
             <Typography variant='h6'>Description</Typography>
           </CardContent>
 
