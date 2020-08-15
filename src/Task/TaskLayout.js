@@ -8,6 +8,7 @@ import CardActions from "@material-ui/core/CardActions";
 import Collapse from "@material-ui/core/Collapse";
 import { red } from "@material-ui/core/colors";
 import { green } from "@material-ui/core/colors";
+import { orange } from "@material-ui/core/colors";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
@@ -25,8 +26,10 @@ export default class TaskStructure extends React.Component {
     this.props.task_change(this.props.identity, to);
   };
   color = (expiry) => {
-    if (expiry < new Date()) {
-      return red[500];
+    if (new Date(expiry).toDateString() == new Date().toDateString()) {
+      return orange[500];
+    } else if (new Date(expiry) < new Date()) {
+      return red[800];
     } else return green[500];
   };
   render() {

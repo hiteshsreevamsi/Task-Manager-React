@@ -1,11 +1,13 @@
 import React from "react";
 import Task from "../Task/TaskLayout";
+import NewTask from "../Task/NewTask";
 import Accordion from "@material-ui/core/Accordion";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
 import AccordionActions from "@material-ui/core/AccordionActions";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import Button from "@material-ui/core/Button";
 
 import { v4 as uuidv4 } from "uuid";
 import Grid from "@material-ui/core/Grid";
@@ -17,6 +19,7 @@ export default class grid extends React.Component {
       dataloaded: false,
       expand: false,
       status: ["To be done", "doing", "done"],
+      popup: false,
       tasks: [
         {
           Task_name: "first",
@@ -32,7 +35,7 @@ export default class grid extends React.Component {
           Task_Description:
             "Write waat ever you want,Write waat ever you want,Write waat ever you want,Write waat ever you want",
           Task_Status: "doing",
-          created: new Date(1597509562728).toDateString(),
+          created: new Date(1546885800000).toDateString(),
           task_id: uuidv4(),
         },
         {
@@ -40,7 +43,7 @@ export default class grid extends React.Component {
           Assigned_to: "hitesh",
           Task_Description: "Write waat ever you want",
           Task_Status: "doing",
-          created: new Date().toDateString(),
+          created: new Date("08-31-2020").toDateString(),
           task_id: uuidv4(),
         },
       ],
@@ -53,10 +56,16 @@ export default class grid extends React.Component {
     };
   }
 
+  pop = () => {
+    this.setState({ popup: true });
+  };
+  pop_close = () => {
+    this.setState({ popup: false });
+  };
   componentDidMount() {
     this.assiging();
     this.setState({ dataloaded: true });
-    console.log(new Date().getTime().toString());
+    console.log(new Date("01/08/2019").getTime().toString());
   }
   assiging = () => {
     let users = {
@@ -122,6 +131,10 @@ export default class grid extends React.Component {
   render() {
     return (
       <div>
+        <Button onClick={this.pop}>Add Task</Button>
+        {this.state.popup ? (
+          <NewTask pop_close={this.pop_close} open={true}></NewTask>
+        ) : null}
         {this.state.dataloaded
           ? Object.keys(this.state.users).map((key) => {
               return (
