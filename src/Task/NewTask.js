@@ -1,5 +1,9 @@
 import React from "react";
-
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import FormControl from "@material-ui/core/FormControl";
+import Select from "@material-ui/core/Select";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -13,11 +17,31 @@ import {
   KeyboardTimePicker,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
+import { v4 as uuidv4 } from "uuid";
 import { Typography } from "@material-ui/core";
 export default class NewTaskStructure extends React.Component {
   constructor() {
     super();
+    this.state = {
+      Task_name: "",
+      Assigned_to: "unassigned",
+      Task_Description: "",
+      Task_Status: "To be done",
+      created: new Date().toDateString(),
+      task_id: uuidv4(),
+    };
   }
+  save = () => {
+    this.props.addnew(this.state);
+  };
+  dataselected = (event) => {
+    let name = event.target.name;
+    let changed = event.target.value;
+    this.setState({ [name]: changed });
+  };
+  dateselected = (event, x) => {
+    this.setState({ created: new Date(x).toDateString() });
+  };
 
   open_popup = () => {
     this.setState({ open: true });
@@ -43,9 +67,12 @@ export default class NewTaskStructure extends React.Component {
                 autoFocus
                 margin='dense'
                 id='name'
-                label='Email Address'
-                type='email'
+                label='Task Title'
+                type='text'
                 fullWidth
+                required
+                name='Task_name'
+                onChange={this.dataselected}
               />
             </span>
             <span>
@@ -54,9 +81,12 @@ export default class NewTaskStructure extends React.Component {
                 autoFocus
                 margin='dense'
                 id='name'
-                label='Email Address'
-                type='email'
+                label='Desc'
+                type='text'
                 fullWidth
+                required
+                name='Task_Description'
+                onChange={this.dataselected}
               />
             </span>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -67,19 +97,52 @@ export default class NewTaskStructure extends React.Component {
                   format='MM/dd/yyyy'
                   margin='normal'
                   id='date-picker-inline'
-                  label='Date picker inline'
+                  label='Due Date'
                   KeyboardButtonProps={{
                     "aria-label": "change date",
                   }}
+                  value={this.state.created}
+                  name='created'
+                  onChange={this.dateselected}
                 />
               </Grid>
             </MuiPickersUtilsProvider>
+            <FormControl>
+              <InputLabel id='demo-simple-select-label-3'>
+                Assigned to
+              </InputLabel>
+              <Select
+                labelId='demo-simple-select-label-3'
+                id='demo-simple-select-3'
+                value={this.state.Assigned_to}
+                name='Assigned_to'
+                onChange={this.dataselected}
+              >
+                {this.props.names.map((name) => {
+                  return <MenuItem value={name}>{name}</MenuItem>;
+                })}
+              </Select>
+            </FormControl>
+            <FormControl style={{ float: "right" }}>
+              <InputLabel id='demo-simple-select-label'>Status</InputLabel>
+              <Select
+                labelId='demo-simple-select-label'
+                id='demo-simple-select'
+                value={this.props.Task_Status}
+                onChange={this.dataselected}
+                disabled
+              >
+                {this.props.status.map((name) => {
+                  return <MenuItem value={name}>{name}</MenuItem>;
+                })}
+              </Select>
+            </FormControl>
           </DialogContent>
           <DialogActions>
             <Button autoFocus onClick={this.props.pop_close} color='primary'>
               Cancel
             </Button>
-            <Button onClick={this.props.pop_close} color='primary'>
+            <Button onClick={this.save} color='primary'>
               Ok
             </Button>
           </DialogActions>

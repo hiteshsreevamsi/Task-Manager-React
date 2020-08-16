@@ -8,9 +8,11 @@ import AccordionActions from "@material-ui/core/AccordionActions";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Button from "@material-ui/core/Button";
+import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 
 import { v4 as uuidv4 } from "uuid";
 import Grid from "@material-ui/core/Grid";
+import { th } from "date-fns/locale";
 export default class grid extends React.Component {
   constructor() {
     super();
@@ -23,7 +25,7 @@ export default class grid extends React.Component {
       tasks: [
         {
           Task_name: "first",
-          Assigned_to: "unassign",
+          Assigned_to: "unassigned",
           Task_Description: "Write waat ever you want",
           Task_Status: "doing",
           created: new Date().toDateString(),
@@ -31,7 +33,7 @@ export default class grid extends React.Component {
         },
         {
           Task_name: "second",
-          Assigned_to: "unassign",
+          Assigned_to: "unassigned",
           Task_Description:
             "Write waat ever you want,Write waat ever you want,Write waat ever you want,Write waat ever you want",
           Task_Status: "doing",
@@ -55,6 +57,13 @@ export default class grid extends React.Component {
       },
     };
   }
+  addnew = (newtask) => {
+    let existing = this.state.tasks;
+    existing.push(newtask);
+
+    this.setState({ tasks: existing, popup: false });
+    this.assiging();
+  };
 
   pop = () => {
     this.setState({ popup: true });
@@ -65,14 +74,13 @@ export default class grid extends React.Component {
   componentDidMount() {
     this.assiging();
     this.setState({ dataloaded: true });
-    console.log(new Date("01/08/2019").getTime().toString());
   }
   assiging = () => {
     let users = {
       hitesh: [],
       "sri sai": [],
       sanjay: [],
-      unassign: [],
+      unassigned: [],
     };
     this.state.tasks.map((task, id) => {
       try {
@@ -131,9 +139,18 @@ export default class grid extends React.Component {
   render() {
     return (
       <div>
-        <Button onClick={this.pop}>Add Task</Button>
+        <Button onClick={this.pop}>
+          <AddCircleOutlineIcon /> Add Task
+        </Button>
         {this.state.popup ? (
-          <NewTask pop_close={this.pop_close} open={true}></NewTask>
+          <NewTask
+            pop_close={this.pop_close}
+            names={Object.keys(this.state.users)}
+            open={true}
+            status={this.state.status}
+            Task_Status={"To be done"}
+            addnew={this.addnew}
+          ></NewTask>
         ) : null}
         {this.state.dataloaded
           ? Object.keys(this.state.users).map((key) => {
@@ -144,15 +161,27 @@ export default class grid extends React.Component {
                     aria-controls='panel1bh-content'
                     id='panel1bh-header'
                   >
-                    <Typography> {key}</Typography>
+                    <Typography
+                      style={{
+                        fontSize: 20,
+                        flexBasis: "33.33%",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {" "}
+                      {key}
+                    </Typography>
+                    <Typography>
+                      {this.state.users[key].length} Tasks
+                    </Typography>
                   </AccordionSummary>
                   <AccordionDetails>
                     <Grid container spacing={2}>
                       <Grid item xs={12}>
                         <Grid container justify='center' spacing={2}>
                           {["To be done", "doing", "done"].map((value) => (
-                            <Grid key={value} item>
-                              <h5>{value}</h5>
+                            <Grid key={value} item style={{ minWidth: 300 }}>
+                              <Typography justify='center'>{value}</Typography>
                               {this.taskdata(key, value)}
                             </Grid>
                           ))}
