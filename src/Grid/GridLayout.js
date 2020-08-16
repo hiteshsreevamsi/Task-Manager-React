@@ -4,58 +4,60 @@ import NewTask from "../Task/NewTask";
 import Accordion from "@material-ui/core/Accordion";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
-import AccordionActions from "@material-ui/core/AccordionActions";
-import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Button from "@material-ui/core/Button";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 import TextField from "@material-ui/core/TextField";
 import { v4 as uuidv4 } from "uuid";
 import Grid from "@material-ui/core/Grid";
-import { th } from "date-fns/locale";
+import CancelIcon from "@material-ui/icons/Cancel";
+import SaveIcon from "@material-ui/icons/Save";
+import { Typography } from "@material-ui/core";
+
 export default class grid extends React.Component {
   constructor() {
     super();
 
     this.state = {
       dataloaded: false,
-      expand: false,
-      status: ["To be done", "doing", "done"],
+      expand: {},
+      status: ["To be done", "Doing", "Done"],
       popup: false,
       newUser: false,
       newusername: "",
       tasks: [
         {
           Task_name: "first",
-          Assigned_to: "unassigned",
+          Assigned_to: "Unassigned",
           Task_Description: "Write waat ever you want",
-          Task_Status: "doing",
+          Task_Status: "Doing",
           created: new Date().toDateString(),
           task_id: uuidv4(),
+          errortext: false,
         },
         {
           Task_name: "second",
-          Assigned_to: "unassigned",
+          Assigned_to: "Winuall",
           Task_Description:
             "Write waat ever you want,Write waat ever you want,Write waat ever you want,Write waat ever you want",
-          Task_Status: "doing",
+          Task_Status: "Doing",
           created: new Date(1546885800000).toDateString(),
           task_id: uuidv4(),
         },
         {
           Task_name: "third",
-          Assigned_to: "hitesh",
+          Assigned_to: "Hitesh",
           Task_Description: "Write waat ever you want",
-          Task_Status: "doing",
+          Task_Status: "Doing",
           created: new Date("08-31-2020").toDateString(),
           task_id: uuidv4(),
         },
       ],
       users: {
-        hitesh: [],
-        "sri sai": [],
-        sanjay: [],
-        unassign: [],
+        Hitesh: [],
+        Winuall: [],
+        Sanjay: [],
+        Unassigned: [],
       },
     };
   }
@@ -68,17 +70,21 @@ export default class grid extends React.Component {
   };
   adduser = () => {
     let tempusers = this.state.users;
-    try {
-      if (tempusers[this.state.newusername].length != 0) {
-        this.usernamecancel();
-        alert("user already exists");
+    if (this.state.newusername.trim() != "") {
+      try {
+        if (tempusers[this.state.newusername].length != 0) {
+          this.usernamecancel();
+          alert("user already exists");
+        }
+      } catch (e) {
+        tempusers[this.state.newusername] = [];
       }
-    } catch (e) {
-      tempusers[this.state.newusername] = [];
-    }
 
-    this.setState({ users: tempusers });
-    this.usernamecancel();
+      this.setState({ users: tempusers });
+      this.usernamecancel();
+    } else {
+      this.setState({ errortext: true });
+    }
   };
   pop = () => {
     this.setState({ popup: true });
@@ -91,23 +97,31 @@ export default class grid extends React.Component {
     this.setState({ dataloaded: true });
   }
   assiging = () => {
-    let users = {
-      hitesh: [],
-      "sri sai": [],
-      sanjay: [],
-      unassigned: [],
-    };
+    let user_names = Object.keys(this.state.users);
+    let users = {};
+    for (let i = 0; i < user_names.length; i++) {
+      users[user_names[i]] = [];
+    }
+
     this.state.tasks.map((task, id) => {
       try {
         users[task.Assigned_to].push(task);
       } catch (error) {
-        users["unassigned"].push(task);
+        users["Unassigned"].push(task);
       }
     });
     this.setState({ users });
   };
-  expand = () => {
-    this.setState({ expand: !this.state.expand });
+  expand = (index) => {
+    if (this.state.expand[index] != null) {
+      this.setState({
+        expand: { ...this.state.expand, [index]: !this.state.expand[index] },
+      });
+    } else {
+      this.setState({
+        expand: { ...this.state.expand, [index]: true },
+      });
+    }
   };
   usernamecancel = () => {
     this.setState({ newUser: false });
@@ -160,25 +174,46 @@ export default class grid extends React.Component {
   render() {
     return (
       <div>
-        <Button onClick={this.pop}>
-          <AddCircleOutlineIcon /> Add Task
-        </Button>
-        <Button onClick={this.text}>
-          <AddCircleOutlineIcon />
-          Add User
-        </Button>
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <Button onClick={this.text}>
+            <AddCircleOutlineIcon />
+            Add User
+          </Button>
+          <Button onClick={this.pop}>
+            <AddCircleOutlineIcon /> Add Task
+          </Button>
+        </div>
         {this.state.newUser ? (
           <div>
             <TextField
+              autoFocus
+              error={this.state.errortext}
+              margin='dense'
+              label='Name'
               type='text'
               onChange={(event, newValue) =>
-                this.setState({ newusername: event.target.value })
+                this.setState({
+                  newusername: event.target.value,
+                  errortext: false,
+                })
               }
             >
               {" "}
             </TextField>
-            <Button onClick={this.usernamecancel}>Cancel</Button>
-            <Button onClick={this.adduser}>save</Button>
+            <Button onClick={this.usernamecancel}>
+              <CancelIcon />
+              Cancel
+            </Button>
+            <Button onClick={this.adduser}>
+              <SaveIcon />
+              save
+            </Button>
           </div>
         ) : null}
         {this.state.popup ? (
@@ -192,9 +227,12 @@ export default class grid extends React.Component {
           ></NewTask>
         ) : null}
         {this.state.dataloaded
-          ? Object.keys(this.state.users).map((key) => {
+          ? Object.keys(this.state.users).map((key, index) => {
               return (
-                <Accordion expanded={this.state.expand} onChange={this.expand}>
+                <Accordion
+                  expanded={this.state.expand[index]}
+                  onChange={() => this.expand(index)}
+                >
                   <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
                     aria-controls='panel1bh-content'
@@ -210,23 +248,29 @@ export default class grid extends React.Component {
                       {" "}
                       {key}
                     </Typography>
-                    <Typography>
+                    <Typography style={{ color: "darkgray" }}>
                       {this.state.users[key].length} Tasks
                     </Typography>
                   </AccordionSummary>
                   <AccordionDetails>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12}>
-                        <Grid container justify='center' spacing={2}>
-                          {["To be done", "doing", "done"].map((value) => (
-                            <Grid key={value} item style={{ minWidth: 300 }}>
-                              <Typography justify='center'>{value}</Typography>
-                              {this.taskdata(key, value)}
-                            </Grid>
-                          ))}
+                    {this.state.users[key].length > 0 ? (
+                      <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                          <Grid container justify='center' spacing={2}>
+                            {["To be done", "Doing", "Done"].map((value) => (
+                              <Grid key={value} item style={{ minWidth: 300 }}>
+                                <Typography justify='center'>
+                                  {value}
+                                </Typography>
+                                {this.taskdata(key, value)}
+                              </Grid>
+                            ))}
+                          </Grid>
                         </Grid>
                       </Grid>
-                    </Grid>
+                    ) : (
+                      "No tasks assigned"
+                    )}
                   </AccordionDetails>
                 </Accordion>
               );
