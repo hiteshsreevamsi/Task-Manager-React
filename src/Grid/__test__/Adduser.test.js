@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import GridLayout from "../Grid/GridLayout";
+import GridLayout from "../GridLayout";
 
 test("renders without crashing", () => {
   const div = document.createElement("div");
