@@ -9,7 +9,7 @@ import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Button from "@material-ui/core/Button";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
-
+import TextField from "@material-ui/core/TextField";
 import { v4 as uuidv4 } from "uuid";
 import Grid from "@material-ui/core/Grid";
 import { th } from "date-fns/locale";
@@ -22,6 +22,8 @@ export default class grid extends React.Component {
       expand: false,
       status: ["To be done", "doing", "done"],
       popup: false,
+      newUser: false,
+      newusername: "",
       tasks: [
         {
           Task_name: "first",
@@ -64,7 +66,20 @@ export default class grid extends React.Component {
     this.setState({ tasks: existing, popup: false });
     this.assiging();
   };
+  adduser = () => {
+    let tempusers = this.state.users;
+    try {
+      if (tempusers[this.state.newusername].length != 0) {
+        this.usernamecancel();
+        alert("user already exists");
+      }
+    } catch (e) {
+      tempusers[this.state.newusername] = [];
+    }
 
+    this.setState({ users: tempusers });
+    this.usernamecancel();
+  };
   pop = () => {
     this.setState({ popup: true });
   };
@@ -94,6 +109,9 @@ export default class grid extends React.Component {
   expand = () => {
     this.setState({ expand: !this.state.expand });
   };
+  usernamecancel = () => {
+    this.setState({ newUser: false });
+  };
   updateAssignment = (id, to) => {
     let scope = this.state.tasks.filter((item) => item.task_id === id);
     let nonScope = this.state.tasks.filter((item) => item.task_id != id);
@@ -111,6 +129,9 @@ export default class grid extends React.Component {
       tasks: [...scope, ...nonScope],
     });
     this.assiging();
+  };
+  text = () => {
+    this.setState({ newUser: true });
   };
   taskdata = (data, status) => {
     return this.state.users[data].map((task) => {
@@ -142,6 +163,24 @@ export default class grid extends React.Component {
         <Button onClick={this.pop}>
           <AddCircleOutlineIcon /> Add Task
         </Button>
+        <Button onClick={this.text}>
+          <AddCircleOutlineIcon />
+          Add User
+        </Button>
+        {this.state.newUser ? (
+          <div>
+            <TextField
+              type='text'
+              onChange={(event, newValue) =>
+                this.setState({ newusername: event.target.value })
+              }
+            >
+              {" "}
+            </TextField>
+            <Button onClick={this.usernamecancel}>Cancel</Button>
+            <Button onClick={this.adduser}>save</Button>
+          </div>
+        ) : null}
         {this.state.popup ? (
           <NewTask
             pop_close={this.pop_close}
